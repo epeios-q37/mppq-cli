@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Configurations xmlns:xpp="http://q37.info/ns/xpp/">
+ <Configuration target="mppq">
+  <Parameters>
+   <Language>en</Language>
+   <Command>Process</Command>
+  </Parameters>
+  <Definitions/>
+  <Locale>
+   <Translations message="VersionCommandDescription">
+    <Translation language="fr">Affiche la version du programme.</Translation>
+    <Translation language="en">Displays the version of the program.</Translation>
+   </Translations>
+   <Translations message="LicenseCommandDescription">
+    <Translation language="fr">Affiche la licence du programme.</Translation>
+    <Translation language="en">Displays the program license.</Translation>
+   </Translations>
+   <Translations message="UsageCommandDescription">
+    <Translation language="fr">Affiche cette page.</Translation>
+    <Translation language="en">Displays this page.</Translation>
+   </Translations>
+   <Translations text="ProcessCommandDescription">
+    <Translation language="fr">Traite le markdown.</Translation>
+    <Translation language="en">Process the markdown.</Translation>
+   </Translations>
+   <Translations text="InputArgumentDescription">
+    <Translation language="fr">Nom du fichier d'entrée (utilisation de l'entrée standard si absent).</Translation>
+    <Translation language="en">Input file name (use of standard input if missing).</Translation>
+   </Translations>
+   <Translations text="InputArgumentLabel">
+    <Translation language="fr">in</Translation>
+    <Translation language="en">in</Translation>
+   </Translations>
+   <Translations text="OutputArgumentDescription">
+    <Translation language="fr">Nom du fichier de sortie (utilisation de la sortie standard si absent).</Translation>
+    <Translation language="en">Output file name (use of standard output if missing).</Translation>
+   </Translations>
+   <Translations text="OutputArgumentLabel">
+    <Translation language="fr">out</Translation>
+    <Translation language="en">out</Translation>
+   </Translations>
+  </Locale>
+  <Arguments>
+   <Argument id="Usage" Description="UsageCommandDescription" long="help" Value="Usage"/>
+   <Argument id="Version" Description="VersionCommandDescription" long="version" Value="Version"/>
+   <Argument id="License" Description="LicenseCommandDescription" long="license" Value="License"/>
+   <Argument id="Process" Description="ProcessCommandDescription" long="process" short="p" Value="Process" Usage="[%InputArgument% [%OutputArgument%]]"/>
+   <Argument id="InputArgument" Description="InputArgumentDescription" Path="Input" Label="InputArgumentLabel"/>
+   <Argument id="OutputArgument" Description="OutputArgumentDescription" Path="Output" Label="OutputArgumentLabel"/>
+   <Layouts>
+    <Layout command="Process">
+     <Link index="0" Target="InputArgument"/>
+     <Link index="1" Target="OutputArgument"/>
+    </Layout>
+   </Layouts>
+  </Arguments>
+ </Configuration>
+</Configurations>
