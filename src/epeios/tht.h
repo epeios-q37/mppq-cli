@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 1999-2017 Claude SIMON (http://q37.info/contact/).
+	Copyright (C) 1999 Claude SIMON (http://q37.info/contact/).
 
 	This file is part of the Epeios framework.
 
@@ -109,14 +109,14 @@ namespace tht {
 		mtx::rHandler Mutex_;
 		void Release_( void )
 		{
-			if ( Mutex_ != mtx::UndefinedHandler )
+			if ( Mutex_ != mtx::Undefined )
 				Delete( Mutex_ );
 
-			Mutex_ = mtx::UndefinedHandler;
+			Mutex_ = mtx::Undefined;
 		}
 		void Test_( void ) const
 		{
-			if ( Mutex_ == mtx::UndefinedHandler )
+			if ( Mutex_ == mtx::Undefined )
 				qRFwk();
 		}
 	public:
@@ -126,7 +126,7 @@ namespace tht {
 			if ( P )
 				Release_();
 
-			Mutex_ = mtx::UndefinedHandler;
+			Mutex_ = mtx::Undefined;
 			ThreadID = Undefined;
 		}
 		qCDTOR( rCore_ );
@@ -347,7 +347,7 @@ namespace tht {
 		mtx::rHandler Write_, Read_;
 		void Delete_( mtx::rHandler Handler )
 		{
-			if ( Handler != mtx::UndefinedHandler )
+			if ( Handler != mtx::Undefined )
 				mtx::Delete( Handler, true );
 		}
 	public:
@@ -358,7 +358,7 @@ namespace tht {
 				Delete_( Read_ );
 			}
 
-			Write_ = Read_ = mtx::UndefinedHandler;
+			Write_ = Read_ = mtx::Undefined;
 		}
 		qCDTOR( rReadWrite );
 		void Init( void )
@@ -371,31 +371,39 @@ namespace tht {
 
 			mtx::Lock( Read_ );
 		}
-		void WriteBegin( void )
+		bso::sBool WriteBegin( tol::sDelay Timeout = 0 )	// If != 0, returns 'false' after 'Timeout' ms, otherwise returns 'true' when locks succeeds.
 		{
-			mtx::Lock( Write_ );
+			return mtx::Lock( Write_, Timeout );
 		}
 		void WriteEnd( void )
 		{
 			mtx::Unlock( Read_ );
 		}
-		void WriteDismiss( void )
+		bso::sBool WriteDismiss( tol::sDelay Timeout = 0 )	// If != 0, returns 'false' after 'Timeout' ms, otherwise returns 'true' when locks succeeds.
 		{
-			WriteBegin();
+			if ( !WriteBegin( Timeout ) )
+				return false;
+
 			WriteEnd();
+
+			return true;
 		}
-		void ReadBegin( void )
+		bso::sBool ReadBegin( tol::sDelay Timeout = 0 )	// If != 0, returns 'false' after 'Timeout' ms, otherwise returns 'true' when locks succeeds.
 		{
-			mtx::Lock( Read_ );
+			return mtx::Lock( Read_, Timeout );
 		}
 		void ReadEnd( void )
 		{
 			mtx::Unlock( Write_ );
 		}
-		void ReadDismiss( void )
+		bso::sBool ReadDismiss( tol::sDelay Timeout = 0 )	// If != 0, returns 'false' after 'Timeout' ms, otherwise returns 'true' when locks succeeds.
 		{
-			ReadBegin();
+			if ( !ReadBegin( Timeout ) )
+				return false;
+
 			ReadEnd();
+
+			return true;
 		}
 	};
 	

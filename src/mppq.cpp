@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 2018 by Claude SIMON (http://zeusw.org/epeios/contact.html).
+	Copyright (C) 2017 by Claude SIMON (http://zeusw.org/epeios/contact.html).
 
 	This file is part of 'MPPq'.
 
@@ -36,6 +36,8 @@ using cio::CErr;
 using cio::COut;
 using cio::CIn;
 
+SCLI_DEF( mppq, NAME_LC, NAME_MC );
+
 namespace {
 	typedef str::dStrings dSlide;
 	qW( Slide );
@@ -47,14 +49,21 @@ namespace {
 		COut << txf::pad << "Build : " __DATE__ " " __TIME__ << " (" << cpe::GetDescription() << ')' << txf::nl;
 	}
 
+	void PrintSlideSeparator_( txf::sWFlow &Flow )
+	{
+		// 'Marp' slide separator.
+		Flow << txf::nl << "---" << txf::nl;
+	}
+
 	void Display_(
 		sdr::sRow Last,
 		const dSlide &Slide,
-		txf::sWFlow &Flow )
+		txf::sWFlow &Flow,
+		bso::sBool DisplaySeparator )
 	{
 		sdr::sRow Row = Slide.First();
 
-		if( Last == Row )
+		if( ( Row != qNIL ) && ( Last == Row ) )
 			Flow << Slide( Row );
 		else {
 			while ( Row != Last ) {
@@ -63,6 +72,9 @@ namespace {
 				Row = Slide.Next( Row );
 			}
 		}
+
+		if ( DisplaySeparator )
+			PrintSlideSeparator_( Flow );
 	}
 
 	bso::sBool IsListItem_( const str::dString &Line )
@@ -96,6 +108,8 @@ namespace {
 					DigitFound = true;
 				else if ( C == '*' )
 					SpaceAwaited = true;
+				else if ( C == '-' )
+					SpaceAwaited = true;
 				else if ( C != ' ' )
 					Continue = false;
 			}
@@ -106,24 +120,52 @@ namespace {
 		return Is;
 	}
 
+	bso::sBool IsComment_( const str::dString &Line )
+	{
+		sdr::sRow Row = Line.First();
+
+		while ( (Row != qNIL) && (Line( Row ) == ' ') )
+			Row = Line.Next( Row );
+
+		if ( Row == qNIL )
+			return false;
+
+		return Line.Search( str::wString( "<!--" ) ) == Row;
+	}
+
+
+	sdr::sRow NextSkippingComments_(
+		const str::dStrings &Slide,
+		sdr::sRow Row )
+	{
+		do {
+			Row = Slide.Next( Row );
+		} while ( (Row != qNIL) && IsComment_( Slide( Row ) ) );
+
+		return Row;
+	}
+
 	void Handle_(
 		const str::dStrings &Slide,
 		txf::sWFlow &Flow )
 	{
 		sdr::sRow Row = Slide.First();
+		bso::sBool ListItemDetected = false;
 
 		while ( Row != qNIL ) {
 			if (IsListItem_(Slide(Row))) {
-				Display_(Row, Slide, Flow);
+				Display_(Row, Slide, Flow, true );
 
-				// 'Marp' slide separator.
-				Flow << "---" << txf::nl;
+				ListItemDetected = true;
+			} else if ( ListItemDetected ) {
+				ListItemDetected = false;
+				Display_( Row, Slide, Flow, true );
 			}
 
-			Row = Slide.Next( Row );
+			Row = NextSkippingComments_( Slide, Row );
 		}
 
-		Display_( qNIL, Slide, Flow );
+		Display_( qNIL, Slide, Flow, false );
 	}
 
 	void Process_(
@@ -135,6 +177,7 @@ namespace {
 		str::wString Line;
 		wSlide Slide;
 		bso::sBool Continue = true;
+		bso::sBool SeparatorPending = false;
 	qRB;
 		Flow.Init( RFlow, utf::f_Guess );
 
@@ -147,18 +190,33 @@ namespace {
 				Line.Init();
 				Flow.GetLine( Line );
 
-				Slide.Append( Line );
+				if ( Line.Amount() != 0 ) {
+					if ( Line == "---" ) {
+						Handle_( Slide, WFlow );
 
-				if ( Line == "---" ) {
-					Handle_( Slide, WFlow );
+						SeparatorPending = true;
 
-					Slide.Init();
+						Slide.Init();
+					} else {
+						if ( SeparatorPending ) {
+							PrintSlideSeparator_( WFlow );
+							SeparatorPending = false;
+						}
+
+						Slide.Append( Line );
+					}
 				}
 			}
 		}
 
-		if ( Slide.Amount() != 0 )
+		if ( Slide.Amount() != 0 ) {
+			if ( SeparatorPending ) {
+				PrintSlideSeparator_( WFlow );
+				SeparatorPending = false;
+			}
+
 			Handle_( Slide, WFlow );
+		}
 	qRR;
 	qRT;
 	qRE;
@@ -224,6 +282,11 @@ namespace {
 	}
 }
 
+const scli::sInfo &scltool::SCLTOOLInfo( void )
+{
+	return mppq::Info;
+}
+
 #define C( name )\
 	else if ( Command == #name )\
 		name##_()
@@ -249,7 +312,3 @@ qRT
 qRE
 	return ExitValue;
 }
-
-const char *sclmisc::SCLMISCTargetName = NAME_LC;
-const char *sclmisc::SCLMISCProductName = NAME_MC;
-

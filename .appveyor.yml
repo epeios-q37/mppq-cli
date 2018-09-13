@@ -1,6 +1,8 @@
+# cli.appveyor
+
 environment:
-  version: 20180224
-  affix: mppq
+  version: 20180913
+  label: mppq
 
 platform:
 - x86
@@ -23,14 +25,14 @@ test_script:
 skip_tags: true  
   
 after_build:
-- echo | set /p="%affix%-v%version%" >>tmpfile.tmp || true
+- echo | set /p="%label%-v%version%" >>tmpfile.tmp || true
 - echo | set /p="-win-" >>tmpfile.tmp || true
 - echo | set /p="%platform%" >>tmpfile.tmp || true
 - set /p target= <tmpfile.tmp
 - echo .%target%.
 - set dir=%target%
 - mkdir %dir%
-- copy %affix%.exe %dir%
+- copy %label%.exe %dir%
 - 7z a %target%.zip %dir%
 
 artifacts:

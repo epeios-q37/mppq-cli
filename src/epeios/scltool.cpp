@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 1999-2017 Claude SIMON (http://q37.info/contact/).
+	Copyright (C) 1999 Claude SIMON (http://q37.info/contact/).
 
 	This file is part of the Epeios framework.
 
@@ -75,14 +75,20 @@ static int main_(
 qRH
 	str::string Command;
 	sclmisc::sRack Rack;
+	const scli::sInfo *Info = NULL;
 qRB
+	Info = &SCLTOOLInfo();
+
+	if ( Info == NULL )
+		qRFwk();
+
 	Rack.Init( qRRor_, SCLError_, CIO, Locale_);
 
-	sclmisc::Initialize( Rack, (const char *)NULL );
+	sclmisc::Initialize( Rack, (const char *)NULL, *Info );
 
 	FillRegistry_( Oddities.argc, Oddities.argv, IgnoreUnknownArguments );
 
-	sclmisc::LoadProject();
+	sclmisc::LoadProject( *Info );
 
 	sclmisc::FillSetupRegistry();
 
@@ -91,7 +97,7 @@ qRB
 	Command.Init();
 
 	if ( sclargmnt::GetCommand( Command ) == "Usage" )
-		sclargmnt::PrintUsage( cio::COut );
+		sclargmnt::PrintUsage( *Info, cio::COut );
 	else
 		ExitValue = SCLTOOLMain( Command, Oddities );
 qRR
@@ -133,7 +139,8 @@ qRT
 
 	sclmisc::DumpRegistriesAndOrLocalesIfRequired();
 
-	sclmisc::Quit();
+	if ( Info != NULL )
+		sclmisc::Quit( *Info );
 qRE
 	return ExitValue;
 }
@@ -266,28 +273,9 @@ qRFE( sclmisc::ErrFinal() )
 }
 #endif
 
-static inline void signal_( int s )
-{
-	exit( EXIT_SUCCESS );
-}
-
-static inline void ExitOnSignal_( void )
-{
-#ifdef CPE_S_POSIX
-	signal( SIGHUP, signal_ );
-#elif defined( CPE_S_WIN )
-	signal( SIGBREAK, signal_ );
-#else
-#	error "Undefined target !"
-#endif
-	signal( SIGTERM, signal_ );
-	signal( SIGABRT, signal_ );
-	signal( SIGINT, signal_ );	// Documentations about this signal not very clear, but this handles Ctrl-C.
-}
-
 Q37_GCTOR( scltool )
 {
-	ExitOnSignal_();
+	sclmisc::ExitOnSignal();
 	qRRor_.Init();
 	SCLError_.Init();
 

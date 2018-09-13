@@ -22,7 +22,7 @@
   <Import Project="Windows.targets"/>
   <Import Project="Details.props"/>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>dda713c1-0e13-464f-bca1-dc25b256204f</ProjectGuid>
+    <ProjectGuid>f9d325d4-f8b4-42d8-974f-d324d56c0068</ProjectGuid>
     <RootNamespace>mppq</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props"/>
@@ -130,6 +130,7 @@
     <ClCompile Include="src/epeios/plgn.cpp"/>
     <ClCompile Include="src/epeios/plgncore.cpp"/>
     <ClCompile Include="src/epeios/sclargmnt.cpp"/>
+    <ClCompile Include="src/epeios/scli.cpp"/>
     <ClCompile Include="src/epeios/sclmisc.cpp"/>
     <ClCompile Include="src/epeios/sclerror.cpp"/>
     <ClCompile Include="src/epeios/scllocale.cpp"/>

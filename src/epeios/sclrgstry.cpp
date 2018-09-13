@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 1999-2017 Claude SIMON (http://q37.info/contact/).
+	Copyright (C) 1999 Claude SIMON (http://q37.info/contact/).
 
 	This file is part of the Epeios framework.
 
@@ -209,7 +209,7 @@ rgstry::level__ sclrgstry::GetRawLevel( eLevel Level )
 
 #undef C
 
-const char *sclrgstry::GetLanguage_(
+const char *sclrgstry::GetLanguage(
 	const registry_ &Registry,
 	TOL_CBUFFER___ &Buffer )
 {
