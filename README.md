@@ -10,7 +10,7 @@ Currently, generates a new *markdown* file from an existing one with, for each s
 
 Other features will be provided in the future.
 
-You may be interested into some informations about the [configuration](http://q37.info/s/c/conf/]).
+You may be interested into some informations about the [configuration](http://q37.info/s/c/conf).
 
 <!--Go to [http://q37.info/tools/mppq/](http://q37.info/s/t/mppq/) for more information.-->
 
